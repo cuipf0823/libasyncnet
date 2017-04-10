@@ -7,9 +7,8 @@
 #include <sys/epoll.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <strings.h>
 #include <assert.h>
-#include <vector>
+#include <string.h>
 
 void SetNonBlocking(int fd)
 {
@@ -71,7 +70,12 @@ int main(int argc, char *argv[])
 		ret = epoll_wait(epollfd, events, kMaxEvents, -1);
 		if (ret < 0)
 		{
+			
 			std::cout << "epoll wait failed errno: " << errno << std::endl;
+			if (errno == EINTR)
+			{
+				continue;
+			}
 			break;
 		}
 		for (const auto& iter : events)
@@ -83,7 +87,11 @@ int main(int argc, char *argv[])
 				struct sockaddr_in con_addr;
 				socklen_t len = sizeof(con_addr);
 				int connfd = accept(listenfd, static_cast<sockaddr*>(static_cast<void*>(&con_addr)), &len);
-				assert(connfd != -1);
+				if (connfd == -1)
+				{
+					std::cout << "accept failed errno: " << errno << " : " << strerror(errno) << std::endl;
+					break;
+				}
 				AddFd(epollfd, connfd);
 				std::cout << "new connection come fd: " << connfd << std::endl;
 			}
@@ -108,6 +116,7 @@ int main(int argc, char *argv[])
 					uint32_t len = ret;
 					std::cout << "receive buf size: " << len << " content: " << buffer << std::endl;
 					ret = send(sockfd, buffer, len, 0);
+					std::cout << "send " << ret << " bytes to client" << std::endl;
 					if (ret < 0)
 					{
 						std::cout << "write error!" << std::endl;

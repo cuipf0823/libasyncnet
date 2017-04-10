@@ -19,6 +19,9 @@ def std_loop(connection):
     while True:
         data = sys.stdin.readline().strip('\n').lower().lstrip().rstrip()
         if data:
+            if data == 'quit':
+                g_quit[0] = True
+                break
             connection.send(data)
         else:
             print 'Invalid command! \n'
@@ -29,8 +32,7 @@ def net_loop(connection):
         rs, _, _ = connection.select(1)
         for s in rs:
             # 如果返回data为空，表示服务端断开了连接
-            data = connection.recv()
-            print data
+            data = connection.recv_raw()
             if data:
                 print data
             else:
@@ -41,7 +43,7 @@ def net_loop(connection):
 
 def main():
     welcome()
-    connection = connect.TcpConnection('192.168.208.129', 8888)
+    connection = connect.TcpConnection('192.168.208.128', 8888)
     thread1 = threading.Thread(target=net_loop, args=(connection, ))
     thread2 = threading.Thread(target=std_loop, args=(connection, ))
     thread1.start()

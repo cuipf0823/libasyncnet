@@ -58,14 +58,15 @@ class TcpConnection(object):
         接收原始数据
         """
         all_data = ""
-        while True:
-            rec_data = self.__sock.recv(MAX_RECEIVE_BUF)
-            if len(rec_data) < 0:
-                self.__sock.close()
-                print('receive error')
-            elif len(rec_data) == 0:
-                print('Server close connection')
-                break
+        rec_data = self.__sock.recv(MAX_RECEIVE_BUF)
+        if len(rec_data) < 0:
+            self.__sock.close()
+            print('receive error')
+        elif len(rec_data) == 0:
+            print('Server close connection')
+            self.__sock.close()
+        else:
+            all_data += rec_data
         return all_data
 
     def recv(self):
