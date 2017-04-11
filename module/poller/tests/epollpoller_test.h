@@ -1,3 +1,7 @@
+#ifndef EPOLL_POLLER_TEST_H
+#define EPOLL_POLLER_TEST_H
+
+
 #include "../epollpoller.h"
 #include <string>
 #include <iostream>
@@ -57,3 +61,5 @@ void test_epoll(const std::string& ip, uint32_t port, bool lt_mode = true)
 	}
 	close(listenfd);
 }
+
+#endif

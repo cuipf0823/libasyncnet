@@ -1,3 +1,6 @@
+#ifndef EPOLL_POLLER_H
+#define EPOLL_POLLER_H
+
 #include <stdio.h>
 #include <libgen.h>
 #include <iostream>
@@ -145,3 +148,5 @@ void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 		}
 	}
 }
+
+#endif
