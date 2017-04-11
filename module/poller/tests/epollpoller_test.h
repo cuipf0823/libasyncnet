@@ -2,21 +2,13 @@
 #include <string>
 #include <iostream>
 
-void test_epoll(const std::string& ip, uint32_t port)
+void test_epoll(const std::string& ip, uint32_t port, bool lt_mode = true)
 {
-	if (argc <= 2)
-	{
-		std::cout << "usage: " << basename(argv[0]) << " ip address port number" << std::endl;
-		return -1;
-	}
-	const char* kIp = argv[1];
-	const uint32_t kPort = atoi(argv[2]);
-
 	struct sockaddr_in addr;
 	bzero(static_cast<void*>(&addr), sizeof(sockaddr_in));
-	addr.sin_port = htons(kPort);
+	addr.sin_port = htons(port);
 	addr.sin_family = AF_INET;
-	inet_pton(AF_INET, kIp, &addr.sin_addr);
+	inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
 
 	int ret = 0;
 	int listenfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -25,8 +17,6 @@ void test_epoll(const std::string& ip, uint32_t port)
 	assert(ret != -1);
 	ret = listen(listenfd, SOMAXCONN);
 	assert(ret != -1);
-
-	constexpr uint32_t kMaxBuffer = 65535;
 	constexpr uint32_t kMaxEvents = 1000;
 	struct epoll_event events[kMaxEvents];
 	int epollfd = epoll_create(5);
@@ -49,7 +39,14 @@ void test_epoll(const std::string& ip, uint32_t port)
 			break;
 		}
 		//LT or ET
-
+		if (lt_mode)
+		{
+			LT_Mode(events, ret, epollfd, listenfd);
+		}
+		else
+		{
+			ET_Mode(events, ret, epollfd, listenfd);
+		}
 	}
 	close(listenfd);
 }

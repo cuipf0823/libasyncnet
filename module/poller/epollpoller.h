@@ -29,11 +29,11 @@ void RemoveFd(int epollfd, int fd)
 constexpr uint32_t kMaxBuffer = 65535;
 
 //水平触发模式(默认)
-void LT_Mode(epoll_event* events, int number, int epollfd, int listenfd)
+void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 {
-	for (const auto& iter : events)
+	for (int idx = 0; idx < number; ++idx)
 	{
-		int sockfd = iter.data.fd;
+		int sockfd = events[idx].data.fd;
 		if (sockfd == listenfd)
 		{
 			//新的连接到来
@@ -48,7 +48,7 @@ void LT_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 			AddFd(epollfd, connfd);
 			std::cout << "new connection come fd: " << connfd << std::endl;
 		}
-		else if (iter.events & EPOLLIN)
+		else if (events[idx].events & EPOLLIN)
 		{
 			//此次读取不完, 下次仍然会触发
 			char buffer[kMaxBuffer] = { 0 };
@@ -79,12 +79,13 @@ void LT_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 		}
 	}
 }
+
 //边沿触发模式
-void ET_Mode(epoll_event* events, int number, int epollfd, int listenfd)
+void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 {
-	for (const auto& iter : events)
+	for (int idx = 0; idx < number; ++idx)
 	{
-		int sockfd = iter.data.fd;
+		int sockfd = events[idx].data.fd;
 		if (sockfd == listenfd)
 		{
 			//新的连接到来
@@ -99,7 +100,7 @@ void ET_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 			AddFd(epollfd, connfd);
 			std::cout << "new connection come fd: " << connfd << std::endl;
 		}
-		else if (iter.events & EPOLLIN)
+		else if (events[idx].events & EPOLLIN)
 		{
 			char buffer[kMaxBuffer] = { 0 };
 			int ret = 0;
@@ -108,14 +109,16 @@ void ET_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 				ret = recv(sockfd, buffer + strlen(buffer), kMaxBuffer - 1, 0);
 				if (ret < 0)
 				{
+					//非阻塞模式下, 下面情况表示全部读取完毕
 					if (errno == EAGAIN || errno == EWOULDBLOCK)
 					{
-						std::cout << "read finish completely!"
+						std::cout << "read finish completely!" << std::endl;
 						break;
 					}
 					RemoveFd(epollfd, sockfd);
 					close(sockfd);
 					std::cout << "recv socket fd: " << sockfd << " error" << " close"<< std::endl;
+					break;
 				}
 				else if (ret == 0)
 				{
@@ -125,7 +128,7 @@ void ET_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 				}
 				else
 				{
-					uint32_t len = ret;
+					uint32_t len = strlen(buffer);
 					std::cout << "receive buf size: " << len << " content: " << buffer << std::endl;
 					ret = send(sockfd, buffer, len, 0);
 					std::cout << "send " << ret << " bytes to client" << std::endl;
@@ -133,10 +136,8 @@ void ET_Mode(epoll_event* events, int number, int epollfd, int listenfd)
 					{
 						std::cout << "write error!" << std::endl;
 					}
-
 				}
 			}
-			
 		}
 	}
 }
