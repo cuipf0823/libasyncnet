@@ -21,7 +21,14 @@ void test_epoll(const std::string& ip, uint32_t port, bool lt_mode = true)
 	struct epoll_event events[kMaxEvents];
 	int epollfd = epoll_create(5);
 	assert(epollfd != -1);
-	AddFd(epollfd, listenfd);
+	if (lt_mode)
+	{
+		AddFd(epollfd, listenfd, false);
+	}
+	else
+	{
+		AddFd(epollfd, listenfd, true);
+	}
 
 
 	std::cout << "Server start ..." << std::endl;

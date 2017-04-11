@@ -11,11 +11,15 @@
 #include "common.h"
 
 
-void AddFd(int epollfd, int fd)
+void AddFd(int epollfd, int fd, bool enable_et)
 {
 	epoll_event event;
 	event.data.fd = fd;
 	event.events = EPOLLIN;
+	if (enable_et)
+	{
+		event.events |= EPOLLET;
+	}
 	epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
 	SetNonBlocking(fd);
 }
@@ -45,7 +49,7 @@ void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 				std::cout << "accept failed errno: " << errno << " : " << strerror(errno) << std::endl;
 				return;
 			}
-			AddFd(epollfd, connfd);
+			AddFd(epollfd, connfd, false);
 			std::cout << "new connection come fd: " << connfd << std::endl;
 		}
 		else if (events[idx].events & EPOLLIN)
@@ -97,7 +101,7 @@ void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 				std::cout << "accept failed errno: " << errno << " : " << strerror(errno) << std::endl;
 				break;
 			}
-			AddFd(epollfd, connfd);
+			AddFd(epollfd, connfd, true);
 			std::cout << "new connection come fd: " << connfd << std::endl;
 		}
 		else if (events[idx].events & EPOLLIN)
