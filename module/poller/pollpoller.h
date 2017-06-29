@@ -62,7 +62,7 @@ void Poll(uint32_t listenfd)
 			{
 				if (iter.fd == listenfd)
 				{
-					//新的连接到来
+					//鏂扮殑杩炴帴鍒版潵
 					struct sockaddr_in con_addr;
 					socklen_t len = sizeof(con_addr);
 					int connfd = accept(listenfd, static_cast<sockaddr*>(static_cast<void*>(&con_addr)), &len);

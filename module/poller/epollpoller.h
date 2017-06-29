@@ -29,13 +29,13 @@ void AddFd(int epollfd, int fd, bool enable_et)
 
 void RemoveFd(int epollfd, int fd)
 {
-	//ÒÆ³ıµÄÊ±ºò×îºóÒ»¸ö²ÎÊı¿ÉÒÔÖ±½Ó´«µİÎªnull
+	//ç§»é™¤çš„æ—¶å€™æœ€åä¸€ä¸ªå‚æ•°å¯ä»¥ç›´æ¥ä¼ é€’ä¸ºnull
 	epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, nullptr);
 }
 
 constexpr uint32_t kMaxBuffer = 65535;
 
-//Ë®Æ½´¥·¢Ä£Ê½(Ä¬ÈÏ)
+//æ°´å¹³è§¦å‘æ¨¡å¼(é»˜è®¤)
 void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 {
 	for (int idx = 0; idx < number; ++idx)
@@ -43,7 +43,7 @@ void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 		int sockfd = events[idx].data.fd;
 		if (sockfd == listenfd)
 		{
-			//ĞÂµÄÁ¬½Óµ½À´
+			//æ–°çš„è¿æ¥åˆ°æ¥
 			struct sockaddr_in con_addr;
 			socklen_t len = sizeof(con_addr);
 			int connfd = accept(listenfd, static_cast<sockaddr*>(static_cast<void*>(&con_addr)), &len);
@@ -57,7 +57,7 @@ void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 		}
 		else if (events[idx].events & EPOLLIN)
 		{
-			//´Ë´Î¶ÁÈ¡²»Íê, ÏÂ´ÎÈÔÈ»»á´¥·¢
+			//æ­¤æ¬¡è¯»å–ä¸å®Œ, ä¸‹æ¬¡ä»ç„¶ä¼šè§¦å‘
 			char buffer[kMaxBuffer] = { 0 };
 			int ret = recv(sockfd, buffer, kMaxBuffer - 1, 0);
 			if (ret < 0)
@@ -87,7 +87,7 @@ void LT_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 	}
 }
 
-//±ßÑØ´¥·¢Ä£Ê½
+//è¾¹æ²¿è§¦å‘æ¨¡å¼
 void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 {
 	for (int idx = 0; idx < number; ++idx)
@@ -95,7 +95,7 @@ void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 		int sockfd = events[idx].data.fd;
 		if (sockfd == listenfd)
 		{
-			//ĞÂµÄÁ¬½Óµ½À´
+			//æ–°çš„è¿æ¥åˆ°æ¥
 			struct sockaddr_in con_addr;
 			socklen_t len = sizeof(con_addr);
 			int connfd = accept(listenfd, static_cast<sockaddr*>(static_cast<void*>(&con_addr)), &len);
@@ -116,7 +116,7 @@ void ET_Mode(const epoll_event* events, int number, int epollfd, int listenfd)
 				ret = recv(sockfd, buffer + strlen(buffer), kMaxBuffer - 1, 0);
 				if (ret < 0)
 				{
-					//·Ç×èÈûÄ£Ê½ÏÂ, ÏÂÃæÇé¿ö±íÊ¾È«²¿¶ÁÈ¡Íê±Ï
+					//éé˜»å¡æ¨¡å¼ä¸‹, ä¸‹é¢æƒ…å†µè¡¨ç¤ºå…¨éƒ¨è¯»å–å®Œæ¯•
 					if (errno == EAGAIN || errno == EWOULDBLOCK)
 					{
 						std::cout << "read finish completely!" << std::endl;
