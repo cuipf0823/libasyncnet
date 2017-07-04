@@ -1,5 +1,7 @@
-#ifndef LOG_LOGGING_H
-#define LOG_LOGGING_H
+#ifndef ASYNCNET_LOG_LOGGING_H
+#define ASYNCNET_LOG_LOGGING_H
+namespace asyncnet
+{
 namespace Log
 {
 
@@ -17,5 +19,6 @@ private:
 
 };
 
+}
 }
 #endif

@@ -308,3 +308,5 @@ gcc_Debug.h
 gcc_Release.h
 VisualGDBCache/
 *pyc
+build/
+lib/

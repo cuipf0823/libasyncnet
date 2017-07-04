@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.6)
-project(asyncnet_log)
-set(SRC_PATH ${CMAKE_SOURCE_DIR}/)
-SET(SRC_LIST
-${SRC_PATH}log_stream_test.cc
-)
-add_executable(log_test ${SRC_LIST}})
+cmake_minimum_required(VERSION 2.8)
+project(log_test)
+set(CMAKE_USE_RELATIVE_PATHS TRUE)
+find_path(LOG_INCLUDE_DIR  log_stream.h ../ DOC "the directory where log header exists")
+find_library(LOG_LIBRARY asyncnet_log ../lib/ DOC "the directory where asyncnet log exists")
+include_directories(${LOG_INCLUDE_DIR})
+add_executable(log_test log_stream_test.cc)
 add_definitions("-g -DDEBUG -Wall -MMD -funroll-loops -std=c++11")
+target_link_libraries(log_test ${LOG_LIBRARY})

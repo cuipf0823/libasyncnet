@@ -1,5 +1,9 @@
-#ifndef LOG_FILE_SINKS_H
-#define LOG_FILE_SINKS_H
+#ifndef ASYNCNET_LOG_FILE_SINKS_H
+#define ASYNCNET_LOG_FILE_SINKS_H
+namespace asyncnet
+{
+
+
 namespace log
 {
 class FileSinks : public Sinks
@@ -7,5 +11,6 @@ class FileSinks : public Sinks
 
 };
 
+}
 }
 #endif
