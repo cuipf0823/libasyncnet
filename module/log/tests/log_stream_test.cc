@@ -20,13 +20,18 @@ int main(int argc, char *argv[])
 	stream << " float max:" << std::numeric_limits<float>::max();
 	stream << "\ndouble min:" << std::numeric_limits<double>::min();
 	stream << " double max:" << std::numeric_limits<double>::max();
-	stream << "\n long long min:" << std::numeric_limits<long long>::min();
+	stream << "\nlong long min:" << std::numeric_limits<long long>::min();
 	stream << " long long max:" << std::numeric_limits<long long>::max();
-	stream << "\n char:" << std::numeric_limits<char>::min();
-	stream << " char:" << std::numeric_limits<char>::max();
-	std::string str("string test!!");
-	//stream << "\n" << str;
-	stream << "\n end";
+
+	int* p = new int(100);
+	uintptr_t v = reinterpret_cast<uintptr_t>(p);
+	char ch_min = 'a';
+	char ch_max = 'Z';
+	stream << "\nchar min:" << ch_min;
+	stream << " char max:" << ch_max;
+	stream << "\npointer address: " << v;
+	const std::string str("string test!!");
+	stream << "\n" << str << "\nend";
 	std::cout << stream.buffer() << std::endl;
 	return 0;
 }

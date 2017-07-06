@@ -26,7 +26,7 @@ namespace log
 			value /= 16;
 			buffer.push_back(kDigitsHex[lsd]);
 		} while (value != 0);
-		std::reverse(buffer.begin() + pos + 1, buffer.end());
+		std::reverse(buffer.begin() + pos, buffer.end());
 		buffer.push_back('\0');
 	}
 
@@ -38,6 +38,7 @@ namespace log
 		if (value < 0)
 		{
 			buffer.push_back('-');
+			++pos;
 		}
 		do
 		{
@@ -45,7 +46,7 @@ namespace log
 			value /= 10;
 			buffer.push_back(kZero[lsd]);
 		} while (value != 0);
-		std::reverse(buffer.begin() + pos + 1, buffer.end());
+		std::reverse(buffer.begin() + pos, buffer.end());
 		buffer.push_back('\0');
 	}
 
@@ -110,13 +111,13 @@ namespace log
 
 	LogStream& LogStream::operator <<(char value)
 	{
-		buffer_.append(value, 1);
+		buffer_.append(1, value);
 		return *this;
 	}
 
 	LogStream& LogStream::operator <<(unsigned char value)
 	{
-		buffer_.append(value, 1);
+		buffer_.append(1, value);
 		return *this;
 	}
 
