@@ -1,6 +1,7 @@
 #ifndef ASYNCNET_FILE_UTIL_H
 #define ASYNCNET_FILE_UTIL_H
 #include <string>
+#include <stdio.h>
 
 namespace asyncnet
 {

@@ -1,12 +1,14 @@
 #ifndef ASYNCNET_LOG_SINKS_H
 #define ASYNCNET_LOG_SINKS_H
 #include <string>
+#include <memory>
 
 namespace asyncnet
 {
 namespace log
 {
 
+class WritableFile;
 class Sinks
 {
 public:
@@ -32,12 +34,17 @@ public:
 	virtual void Append(const char* buffer, int len);
 	virtual void Flush();
 private:
-	const std::string& GetFileName() const;
+	const std::string GetFileName() const;
 private:
 	const std::string path_;
 	const std::string basename_;
-	const size_t roll_size_;
+	const std::string hostname_;
+	const pid_t pid_;
+	const size_t roll_size_;	
 	const uint32_t interval_;
+	uint32_t count_;			//记录当前日志的大小
+	std::unique_ptr<WritableFile> file_;
+	
 };
 
 }
