@@ -1,6 +1,8 @@
 #include "file_util.h"
-#include <string.h> 
+#include <string.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdio.h>
 
 namespace asyncnet
 {
@@ -23,7 +25,8 @@ namespace log
 
 	bool WritableFile::Append(const char* buffer, size_t length)
 	{
-		size_t ret = fwrite_unlocked(buffer, 1, length, file_);
+		//fwrite_unlocked
+		size_t ret = fwrite(buffer, 1, length, file_);
 		if(ret != length)
 		{
 			fprintf(file_, "Writable::Append failed %s\n", strerror(errno));

@@ -2,6 +2,7 @@
 #define ASYNCNET_LOG_SINKS_H
 #include <string>
 #include <memory>
+#include <sys/types.h>
 
 namespace asyncnet
 {
@@ -34,17 +35,19 @@ public:
 	virtual void Append(const char* buffer, int len);
 	virtual void Flush();
 private:
-	const std::string GetFileName() const;
+	const std::string GetFileName(time_t& now);
 private:
 	const std::string path_;
 	const std::string basename_;
 	const std::string hostname_;
 	const pid_t pid_;
-	const size_t roll_size_;	
+	const size_t roll_size_;
 	const uint32_t interval_;
-	uint32_t count_;			//记录当前日志的大小
+	uint32_t count_;			 //当前日志文件大小
 	std::unique_ptr<WritableFile> file_;
-	
+	time_t last_time_;          //记录上一次生成log文件的时间
+	size_t num_of_period_;      //同期内日志计数
+	time_t last_flush_;         //最后一次flush时间
 };
 
 }
