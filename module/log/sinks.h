@@ -13,8 +13,14 @@ class WritableFile;
 class Sinks
 {
 public:
-	Sinks();
-	virtual ~Sinks();
+	Sinks()
+	{
+
+	}
+	virtual ~Sinks()
+	{
+		
+	}
 	Sinks& operator=(const Sinks&) = delete;
 	Sinks(const Sinks&) = delete;
 
@@ -23,14 +29,16 @@ public:
 	virtual void Flush() = 0;
 };
 
+//输出到文件
 class FileSinks : public Sinks
 {
 public:
 	FileSinks(const std::string& path, const std::string& basename, size_t roll_size, int interval = 3);
 	~FileSinks();
+	/*
 	FileSinks& operator=(const FileSinks&) = delete;
 	FileSinks(const Sinks&) = delete;
-
+	*/
 	virtual void Append(const std::string& buffer);
 	virtual void Append(const char* buffer, int len);
 	virtual void Flush();
@@ -48,6 +56,17 @@ private:
 	time_t last_time_;          //记录上一次生成log文件的时间
 	size_t num_of_period_;      //同期内日志计数
 	time_t last_flush_;         //最后一次flush时间
+};
+
+//标准输入输出
+class StdSinks : public Sinks
+{
+public:
+	StdSinks();
+	~StdSinks();
+	virtual void Append(const std::string& buffer);
+	virtual void Append(const char* buffer, int len);
+	virtual void Flush();
 };
 
 }

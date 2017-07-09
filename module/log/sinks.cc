@@ -113,6 +113,31 @@ namespace log
 		return filename;
 	}
 
+	StdSinks::StdSinks()
+	{
+
+	}
+
+	StdSinks::~StdSinks()
+	{
+
+	}
+
+	void StdSinks::Append(const std::string& buffer)
+	{
+		Append(buffer.c_str(), buffer.length());
+	}
+
+	void StdSinks::Append(const char* buffer, int len)
+	{
+		size_t n = fwrite(buffer, 1, len, stdout);
+		assert(n == len);
+	}
+
+	void StdSinks::Flush()
+	{
+		fflush(stdout);
+	}
 }
 
 }
