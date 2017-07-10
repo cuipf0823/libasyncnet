@@ -24,12 +24,21 @@ class Logging : public Singleton
 public:
 	Logging();
 	~Logging();
-	static void SetLevel();
-	static void AddSinks();
-	static void RemoveSinks();
-	static void Flush();
+	void set_level(LogLevel level)
+	{
+		level_ = level;
+	}
+
+	const LogLevel& level() const
+	{
+		return level_;
+	}
+	void AddSinks(std::shared_ptr<Sinks> sink);
+	void RemoveSinks(std::shared_ptr<Sinks> sink);
+	void Flush();
 private:
-	std::vector<std::shared_ptr<Sinks>> vsinks_;
+	std::vector<std::shared_ptr<Sinks>> sinks_;
+	LogLevel level_;
 };
 
 }
