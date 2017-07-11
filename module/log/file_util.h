@@ -22,7 +22,6 @@ public:
 private:
     std::string filename_;
     FILE* file_;
-
 };
 
 }
