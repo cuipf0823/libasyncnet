@@ -1,5 +1,6 @@
 #include "logging.h"
 #include <assert.h>
+#include <thread>
 #include <sys/time.h>
 
 namespace asyncnet
@@ -13,13 +14,13 @@ namespace log
 	LogLevel Logging::level_ = DEBUG;
     const char* kLevelName[NUM_LEVEL] =
     {
-        "TRACE",
-        "DEBUG",
-        "INFO",
-        "NOTICE",
-        "WARN",
-        "ERROR",
-        "FATAL"
+        "TRACE  ",
+        "DEBUG  ",
+        "INFO   ",
+        "NOTICE ",
+        "WARN   ",
+        "ERROR  ",
+        "FATAL  "
     }
 
     Logging::Logging()
@@ -73,12 +74,12 @@ namespace log
 
 	Logging::Impl(const char* file, int line, LogLevel level)
 	{
-		FormatLog(file, line, level, nullptr);
+		FormatPrefix(file, line, level);
 	}
 
 	Logging::Impl(const char* file, int line, LogLevel level, const char* func)
 	{
-		FormatLog(file, line, level, func);
+		FormatPrefix(file, line, level);
 	}
 
 	Logging::~Impl()
@@ -86,7 +87,7 @@ namespace log
 
 	}
 
-	void Logging::Impl::FormatLog(const char* file, int line, LogLevel level, const char* func)
+	void Logging::Impl::FormatPrefix(const char* file, int line, LogLevel level)
 	{
 		//格式化时间
 		struct timeval tv;
@@ -105,10 +106,13 @@ namespace log
 			stream_ << curTime;
 		}
 		char buf[16] = { 0 };
-		snprintf(buf, sizeof(buf), ".%06d", tv.tv_usec);
+		snprintf(buf, sizeof(buf), ".%06d ", tv.tv_usec);
 		stream_ << buf;
-		
+        //线程ID
+        stream_ << std::this_thread::get_id();
 
+        //日志等级
+        stream_ << " " << kLevelName[level]
 	}
 
 

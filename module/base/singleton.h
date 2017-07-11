@@ -1,34 +1,29 @@
-// Use of this source code is governed by a BSD-style license
-// that can be found in the License file.
-//
-// Author: Shuo Chen (chenshuo at chenshuo dot com)
+#ifndef ASYNCNET_BASE_SINGLETON_H
+#define ASYNCNET_BASE_SINGLETON_H
 
-#ifndef MUDUO_BASE_SINGLETON_H
-#define MUDUO_BASE_SINGLETON_H
-
-#include <boost/noncopyable.hpp>
 #include <assert.h>
 #include <stdlib.h> // atexit
 #include <pthread.h>
 
-namespace muduo
+namespace asyncnet
 {
 
-namespace detail
+namespace base
 {
 // This doesn't detect inherited member functions!
 // http://stackoverflow.com/questions/1966362/sfinae-to-check-for-inherited-member-functions
 template<typename T>
 struct has_no_destroy
 {
-  template <typename C> static char test(typeof(&C::no_destroy)); // or decltype in C++11
-  template <typename C> static int32_t test(...);
+  template <typename C>
+  static char test(typeof(&C::no_destroy)); // or decltype in C++11
+  template <typename C>
+  static int32_t test(...);
   const static bool value = sizeof(test<T>(0)) == 1;
 };
-}
 
 template<typename T>
-class Singleton : boost::noncopyable
+class Singleton
 {
  public:
   static T& instance()
@@ -37,6 +32,8 @@ class Singleton : boost::noncopyable
     assert(value_ != NULL);
     return *value_;
   }
+  Singleton(const Singleton&) = delete;
+  Singleton& operator=(const Singleton&) = delete;
 
  private:
   Singleton();
@@ -72,5 +69,6 @@ template<typename T>
 T* Singleton<T>::value_ = NULL;
 
 }
-#endif
 
+}
+#endif
