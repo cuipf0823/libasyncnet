@@ -51,7 +51,6 @@ namespace log
 
 	void FileSinks::Append(const char* buffer, int len)
 	{
-		assert(file_);
 		if (!file_ || roll_size_ < len + count_)
 		{
 			//转换文件
@@ -131,7 +130,7 @@ namespace log
 	void StdSinks::Append(const char* buffer, int len)
 	{
 		size_t n = fwrite(buffer, 1, len, stdout);
-		assert(n == len);
+		assert(n == static_cast<size_t>(len));
 	}
 
 	void StdSinks::Flush()

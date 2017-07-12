@@ -1,15 +1,17 @@
 #ifndef ASYNCNET_LOG_LOGGING_H
 #define ASYNCNET_LOG_LOGGING_H
 #include <memory>
+#include <vector>
+#include "log_stream.h"
 
 namespace asyncnet
 {
-namespace Log
+namespace log
 {
 
-class LogStream;
 class Sinks;
-enum LogLevel : char
+#undef DEBUG
+enum LogLevel
 {
 	TRACE,
 	DEBUG,
@@ -21,6 +23,8 @@ enum LogLevel : char
 	NUM_LEVEL
 };
 
+
+
 class Logging
 {
 public:
@@ -31,18 +35,14 @@ public:
 		level_ = level;
 	}
 
-	static LogLevel level() const
+	static LogLevel level()
 	{
 		return level_;
 	}
 
-	static AddSinks(std::shared_ptr<Sinks> sink);
-	static RemoveSinks(std::shared_ptr<Sinks> sink);
-	static void Flush();
-	static void Append(const std::string& buffer);
-	static void Append(const char* buffer, int length);
+	static void AddSinks(std::shared_ptr<Sinks> sink);
+	static void RemoveSinks(std::shared_ptr<Sinks> sink);
 
-private:
 	class Impl
 	{
 	public:
@@ -54,13 +54,20 @@ private:
 			return stream_;
 		}
 	private:
-		void FormatPrefix(LogLevel level)
+		void FormatPrefix(LogLevel level);
 		LogStream stream_;
 		const char* file_;
 		const int line_;
 		const char* func_;
-	}
+		LogLevel cur_level_;
+	};
 
+private:
+	static void Flush();
+	static void Append(const std::string& buffer);
+	static void Append(const char* buffer, int length);
+
+private:
 	static std::vector<std::shared_ptr<Sinks>> sinks_;
 	static LogLevel level_;
 };
@@ -68,23 +75,23 @@ private:
 }
 }
 
-#LOG_TRACE if (asyncnet::log::Logging::level <= asyncnet::log::TRACE) \
+# define LOG_TRACE if (asyncnet::log::Logging::level <= asyncnet::log::TRACE) \
 {\
 	asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::TRACE, __FUNCTION__).stream() \
 }\
 
-#LOG_DEBUG if (asyncnet::log::Logging::level <= asyncnet::log::DEBUG) \
+#define LOG_DEBUG if (asyncnet::log::Logging::level <= asyncnet::log::DEBUG) \
 {\
 	asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::DEBUG, __FUNCTION__).stream() \
 }\
 
-#LOG_INFO if (asyncnet::log::Logging::level <= asyncnet::log::INFO) \
+#define LOG_INFO if (asyncnet::log::Logging::level <= asyncnet::log::INFO) \
 {\
 	asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::INFO).stream() \
 }\
 
-#LOG_NOTICE asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::NOTICE).stream()
-#LOG_WARN asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::WARN).stream()
-#LOG_ERROR asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::ERROR).stream()
-#LOG_FATAL asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::FATAL).stream()
+#define LOG_NOTICE asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::NOTICE).stream()
+#define LOG_WARN asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::WARN).stream()
+#define LOG_ERROR asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::ERROR).stream()
+#define LOG_FATAL asyncnet::log::Logging::Impl(__FILE__, __LINE__, asyncnet::log::FATAL).stream()
 #endif
