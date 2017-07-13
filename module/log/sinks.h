@@ -19,7 +19,7 @@ public:
 	}
 	virtual ~Sinks()
 	{
-		
+
 	}
 	Sinks& operator=(const Sinks&) = delete;
 	Sinks(const Sinks&) = delete;

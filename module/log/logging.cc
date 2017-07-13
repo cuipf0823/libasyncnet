@@ -18,7 +18,7 @@ namespace log
     __thread time_t tLastSecTime = 0;
     __thread char curTime[32] = { 0 };
 
-    const char* kLevelName[LogLevel::NUM_LEVEL] =
+    const char* kLevelName[static_cast<uint32_t>(LogLevel::NUM_LEVEL)] =
     {
         "TRACE  ",
         "DEBUG  ",
@@ -29,8 +29,8 @@ namespace log
         "FATAL  "
     };
 
-	LogLevel Logging::level_ = DEBUG ;
-
+	LogLevel Logging::level_ = LogLevel::DEBUG;
+    Logging::VecSinks Logging::sinks_;
     Logging::Logging()
     {
 
@@ -41,13 +41,13 @@ namespace log
 
     }
 
-    void Logging::AddSinks(std::shared_ptr<Sinks> sink)
+    void Logging::AddSinks(SinksPtr sink)
     {
         assert(sink);
         sinks_.push_back(sink);
     }
 
-    void Logging::RemoveSinks(std::shared_ptr<Sinks> sink)
+    void Logging::RemoveSinks(SinksPtr sink)
     {
 		auto iter = sinks_.begin();
 		for(; iter != sinks_.end(); ++iter)
@@ -83,7 +83,10 @@ namespace log
         }
     }
 
-    Logging::Impl::Impl(const char* file, int line, LogLevel level)
+
+
+
+	Logging::Impl::Impl(const char* file, int line, LogLevel level)
 		: file_(file),
 		line_(line),
 		func_(nullptr),
@@ -106,16 +109,16 @@ namespace log
     {
 		if (func_ != nullptr)
 		{
-			stream_ << " - " << func_;
+			stream_ << " -" << func_;
 		}
 		//只要文件名
 		const char* slash = strrchr(file_, '/');
 		assert(slash != nullptr);
-		stream_ << " - " << slash;
-		stream_ << ":" << line_;
+		stream_ << " -" << slash + 1;
+		stream_ << ":" << line_ << "\n";
 
 		Append(stream_.buffer());
-		if (cur_level_ >= WARN)
+		if (cur_level_ >= LogLevel::WARN)
 		{
 			Flush();
 		}
