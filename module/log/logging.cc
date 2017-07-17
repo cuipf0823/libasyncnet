@@ -84,8 +84,6 @@ namespace log
     }
 
 
-
-
 	Logging::Impl::Impl(const char* file, int line, LogLevel level)
 		: file_(file),
 		line_(line),

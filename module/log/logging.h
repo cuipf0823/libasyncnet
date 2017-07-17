@@ -31,6 +31,9 @@ class Logging
 public:
 	Logging();
 	~Logging();
+	Logging(const Logging& logger) = delete;
+	Logging& operator=(const Logging& logger) = delete;
+
 	static void set_level(LogLevel level)
 	{
 		level_ = level;
@@ -71,6 +74,23 @@ private:
 private:
 	static VecSinks sinks_;
 	static LogLevel level_;
+};
+
+//异步
+class AsyncLogging
+{
+public:
+	AsyncLogging();
+	~AsyncLogging();
+	AsyncLogging(const AsyncLogging& logger) = delete;
+	AsyncLogging& operator=(const AsyncLogging& logger) = delete;
+	void Start();
+
+private:
+	//refer to muduo
+	std::string* cur_buffer_;
+	std::string* backup_buffer_;
+	std::string* output_buffer_;
 };
 
 }
