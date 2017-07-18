@@ -151,6 +151,60 @@ namespace log
 		stream_ << " " << kLevelName[static_cast<int>(level)];
     }
 
+    AsyncLogging::AsyncLogging()
+    : cur_buffer_(new std::string()),
+    output_buffer_(nullptr),
+    bg_thread_(0),
+    cond_(&buffers_mutex_),
+    bg_run_(false)
+    {
+        assert(cur_buffer_ != nullptr);
+    }
+
+    AsyncLogging::~AsyncLogging()
+    {
+
+    }
+
+    void AsyncLogging::ThreadFunc(void* arg)
+    {
+        AsyncLogging* aysnc_log = reinterpret_cast<AsyncLogging*>(arg);
+        assert(aysnc_log != nullptr);
+        while (bg_run_)
+        {
+            buffers_mutex_.lock();
+            while(output_buffer_ == nullptr || (output_buffer_ != nullptr && output_buffer_->empty()))
+            {
+                cond_.wait();
+            }
+            //output_buffer_写到sinks
+
+            output_buffer_->clear();
+
+            buffers_mutex_.unlock();
+        }
+    }
+
+    void AsyncLogging::Start()
+    {
+        //创建线程
+        int ret = pthread_create(&bg_thread_, nullptr, &AsyncLogging::ThreadFunc, this);
+        if (ret != 0)
+        {
+            printf(stderr, "pthread %s: %s\n", "pthread", strerror(ret));
+            abort();
+        }
+        bg_run_ = true;
+
+
+
+    }
+
+    void AsyncLogging::Append(const std::string& str)
+    {
+
+    }
+
 
 
 }

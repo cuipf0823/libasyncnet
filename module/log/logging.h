@@ -2,6 +2,7 @@
 #define ASYNCNET_LOG_LOGGING_H
 #include <memory>
 #include <vector>
+#include <queue>
 #include "log_stream.h"
 
 namespace asyncnet
@@ -76,6 +77,7 @@ private:
 	static LogLevel level_;
 };
 
+class Mutex;
 //异步
 class AsyncLogging
 {
@@ -85,12 +87,18 @@ public:
 	AsyncLogging(const AsyncLogging& logger) = delete;
 	AsyncLogging& operator=(const AsyncLogging& logger) = delete;
 	void Start();
+	void Append(const std::string& buffer);
+	void ThreadFunc(void* arg);
 
 private:
 	//refer to muduo
 	std::string* cur_buffer_;
-	std::string* backup_buffer_;
+	std::queue<std::string*> buffers_;
 	std::string* output_buffer_;
+	Mutex buffers_mutex_;
+	pthread_t bg_thread_;
+	CondVar cond_;
+	bool bg_run_;
 };
 
 }

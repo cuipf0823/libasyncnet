@@ -1,8 +1,10 @@
 #ifndef ASYNCNET_BASE_MUTEX_H
 #define ASYNCNET_BASE_MUTEX_H
+#include <pthread.h>
+
 namespace asyncnet
 {
-namespace log
+namespace base
 {
 
 class CondVar;

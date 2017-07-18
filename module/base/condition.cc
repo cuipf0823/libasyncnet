@@ -1,4 +1,6 @@
 #include "condition.h"
+#include "mutex.h"
+
 namespace asyncnet
 {
 namespace base
@@ -28,6 +30,7 @@ void CondVar::SignalAll()
 {
     pthread_cond_broadcast(&cv_);
 }
+
 }
 
 }

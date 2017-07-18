@@ -1,10 +1,13 @@
 #ifndef ASYNCNET_BASE_CONDITION_H
 #define ASYNCNET_BASE_CONDITION_H
+#include <pthread.h>
 
 namespace asyncnet
 {
 namespace base
 {
+
+class Mutex;
 class CondVar
 {
 public:
