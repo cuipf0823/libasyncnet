@@ -67,7 +67,6 @@ public:
 		LogLevel cur_level_;
 	};
 
-private:
 	static void Flush();
 	static void Append(const std::string& buffer);
 	static void Append(const char* buffer, int length);
@@ -81,6 +80,8 @@ class Mutex;
 //异步
 class AsyncLogging
 {
+	typedef std::shared_ptr<std::string> BufferPtr;
+	typedef std::queue<BufferPtr> BuffersQueue;
 public:
 	AsyncLogging();
 	~AsyncLogging();
@@ -88,17 +89,18 @@ public:
 	AsyncLogging& operator=(const AsyncLogging& logger) = delete;
 	void Start();
 	void Append(const std::string& buffer);
-	void ThreadFunc(void* arg);
+	static void* ThreadFunc(void* arg);
 
 private:
-	//refer to muduo
-	std::string* cur_buffer_;
-	std::queue<std::string*> buffers_;
-	std::string* output_buffer_;
-	Mutex buffers_mutex_;
+	BufferPtr cur_buffer_;
+	BuffersQueue buffers_;
+	BufferPtr output_buffer_;
+	Mutex buffers_mutex_;  	//配合条件变量使用
+	Mutex cur_mutex_;		//管理前端日志的写入
 	pthread_t bg_thread_;
 	CondVar cond_;
 	bool bg_run_;
+	static const uint32_t kBufferMaxLen = 4 * 1024;
 };
 
 }

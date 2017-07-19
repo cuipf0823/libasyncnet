@@ -163,25 +163,31 @@ namespace log
 
     AsyncLogging::~AsyncLogging()
     {
-
+        bg_run_ = false;
     }
 
-    void AsyncLogging::ThreadFunc(void* arg)
+    void* AsyncLogging::g(void* arg)
     {
-        AsyncLogging* aysnc_log = reinterpret_cast<AsyncLogging*>(arg);
+        AsyncLogging* async_log = reinterpret_cast<AsyncLogging*>(arg);
         assert(aysnc_log != nullptr);
-        while (bg_run_)
+        while (async_log->bg_run_)
         {
-            buffers_mutex_.lock();
-            while(output_buffer_ == nullptr || (output_buffer_ != nullptr && output_buffer_->empty()))
+            async_log->buffers_mutex_.Lock();
+            //output_buffer_ == nullptr|| (output_buffer_ != nullptr && output_buffer_->empty())
+            while(async_log->buffers_->empty())
             {
-                cond_.wait();
+                async_log->cond_.Wait();
             }
-            //output_buffer_写到sinks
+            //buffers_非空, 取出序列化到文件
+            async_log->output_buffer_.reset(async_log->buffers_.front());
+            async_log->buffers_.pop();
+            assert(async_log->output_buffer_.unique());
+            async_log->buffers_mutex_.UnLock();
 
-            output_buffer_->clear();
-
-            buffers_mutex_.unlock();
+            if(async_log->output_buffer_ && !async_log->output_buffer_->empty())
+            {
+                //输出到sinks中
+            }
         }
     }
 
@@ -195,14 +201,24 @@ namespace log
             abort();
         }
         bg_run_ = true;
-
-
-
     }
 
     void AsyncLogging::Append(const std::string& str)
     {
-
+        BufferPtr tem_buffer;
+        cur_mutex_.Lock();
+        cur_buffer_->Append(str);
+        if (cur_buffer_->size() >= kBufferMaxLen)
+        {
+            tem_buffer = cur_buffer_;
+            assert(cur_buffer_.use_count() == 2);
+            cur_buffer_.reset(new std::string());
+        }
+        cur_mutex_.UnLock();
+        buffers_mutex_.Lock()
+        buffers_.push(tem_buffer);
+        cond_.Signal();
+        buffers_mutex_.UnLock();
     }
 
 
