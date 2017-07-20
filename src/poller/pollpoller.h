@@ -36,7 +36,7 @@ void RemoveFd(PollFdList& pollfds, int fd)
 
 void Poll(uint32_t listenfd)
 {
-	PollFdList pollfds; 
+	PollFdList pollfds;
 	AddFd(pollfds, listenfd, POLLIN);
 	while (true)
 	{
@@ -82,7 +82,7 @@ void Poll(uint32_t listenfd)
 					{
 						RemoveFd(pollfds, iter.fd);
 						close(iter.fd);
-						std::cout << "recv socket fd: " << iter.fd << " error: " << errno 
+						std::cout << "recv socket fd: " << iter.fd << " error: " << errno
 							<< " : " << strerror(errno) << std::endl;
 					}
 					else if (ret == 0)

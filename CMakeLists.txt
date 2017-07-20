@@ -4,11 +4,11 @@ project(libasyncnet)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-    module/poller/tests/epollpoller_test.h
-    module/poller/tests/pollpoller_test.h
-    module/poller/common.h
-    module/poller/epollpoller.h
-    module/poller/pollpoller.h
+    src/poller/tests/epollpoller_test.h
+    src/poller/tests/pollpoller_test.h
+    src/poller/common.h
+    src/poller/epollpoller.h
+    src/poller/pollpoller.h
     libasyncnet.cc)
 
 add_executable(libasyncnet ${SOURCE_FILES})
