@@ -14,6 +14,7 @@ public:
     explicit CondVar(Mutex* mu);
     ~CondVar();
     void Wait();
+    bool WaitForSeconds(int seconds);
     void Signal();
     void SignalAll();
 private:

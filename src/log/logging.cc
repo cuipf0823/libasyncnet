@@ -33,6 +33,8 @@ namespace log
     Logging::AppendCallBack Logging::append_cb_ = std::bind(&Logging::Append, std::placeholders::_1);
     Logging::FlushCallBack Logging::flush_cb_ = std::bind(&Logging::Flush);
     Logging::AsyncLogPtr Logging::async_log_ = nullptr;
+    uint32_t Logging::interval_ = 2;
+    bool Logging::async_mode_ = false;
 
 	Logging::Logging()
     {
@@ -63,16 +65,22 @@ namespace log
         DumpSinks::RemoveSinks(sink);
     }
 
-    void Logging::SetAsync(bool async)
+    void Logging::SelectAsync()
     {
-        if(async)
+        if(!async_mode_)
         {
-            async_log_.reset(new AsyncLogging());
+            async_log_.reset(new AsyncLogging(interval_));
             assert(async_log_ != nullptr);
 			async_log_->Start();
 			append_cb_ = std::bind(&AsyncLogging::Append, async_log_.get(), std::placeholders::_1);
 			flush_cb_ = std::bind(&AsyncLogging::Flush, async_log_.get());
+            async_mode_ = true;
         }
+    }
+
+    void Logging::SetAsyncInterval(uint32_t interval)
+    {
+        interval_ = interval;
     }
 
 	Logging::Impl::Impl(const char* file, int line, LogLevel level)

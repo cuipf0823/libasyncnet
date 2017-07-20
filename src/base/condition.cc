@@ -1,4 +1,5 @@
 #include "condition.h"
+#include <time.h>
 #include "mutex.h"
 
 namespace asyncnet
@@ -19,6 +20,15 @@ CondVar::~CondVar()
 void CondVar::Wait()
 {
     pthread_cond_wait(&cv_, &mu_->mu_);
+}
+
+bool CondVar::WaitForSeconds(int seconds)
+{
+    struct timespec abstime;
+    // FIXME: use CLOCK_MONOTONIC or CLOCK_MONOTONIC_RAW to prevent time rewind.
+    clock_gettime(CLOCK_REALTIME, &abstime);
+    abstime.tv_sec += seconds;
+    return ETIMEDOUT == pthread_cond_timedwait(&pcond_, &mu_->mu_, &abstime);
 }
 
 void CondVar::Signal()

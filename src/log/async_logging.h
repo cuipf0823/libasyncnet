@@ -17,7 +17,7 @@ class AsyncLogging
 	typedef std::shared_ptr<std::string> BufferPtr;
 	typedef std::queue<BufferPtr> BuffersQueue;
 public:
-	AsyncLogging();
+	AsyncLogging(uint32_t interval);
 	~AsyncLogging();
 	AsyncLogging(const AsyncLogging& logger) = delete;
 	AsyncLogging& operator=(const AsyncLogging& logger) = delete;
@@ -36,7 +36,10 @@ private:
 	pthread_t bg_thread_;
 	asyncnet::base::CondVar cond_;
 	bool bg_run_;
-	static const uint32_t kBufferMaxLen = 4 * 1024;
+	const uint32_t interval_;				// 两次flush间隔最长时间
+	//time_t last_flush_;						//最后一次刷新时间
+	static const uint32_t kMaxBufferQueue = 20;		//BufferQueue队列最大长度, 防止内存爆增
+	static const uint32_t kBufferMaxLen = 4 * 1024; //cur_buffer_ 最大长度
 };
 }
 }

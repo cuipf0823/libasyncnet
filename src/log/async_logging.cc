@@ -9,13 +9,14 @@ namespace asyncnet
 {
 namespace log
 {
-	
-	AsyncLogging::AsyncLogging()
+
+	AsyncLogging::AsyncLogging(uint32_t interval)
 		: cur_buffer_(new std::string()),
 		output_buffer_(nullptr),
 		bg_thread_(0),
 		cond_(&buffers_mutex_),
-		bg_run_(false)
+		bg_run_(false),
+		interval_(interval)
 	{
 		assert(cur_buffer_ != nullptr);
 	}
@@ -34,7 +35,7 @@ namespace log
 			async_log->buffers_mutex_.Lock();
 			while (async_log->buffers_.empty())
 			{
-				async_log->cond_.Wait();
+				async_log->cond_.WaitForSeconds(async_log->interval_);
 			}
 			//buffers_非空, 取出序列化到文件 output_buffers可能为空可能非空
 			auto temp = async_log->buffers_.front();
@@ -86,8 +87,8 @@ namespace log
 		assert(cur_buffer_.use_count() == 2);
 		cur_buffer_.reset(new std::string());
 		cur_mutex_.Unlock();
-		
-		//放入缓存队列中
+
+		//放入缓存队列中 修改last_flush_
 		buffers_mutex_.Lock();
 		assert(tem_buffer.unique());
 		buffers_.push(tem_buffer);
@@ -101,7 +102,7 @@ namespace log
 		//无论cur_buffer_大小直接dump
 		BufferPtr tem_buffer_;
 		cur_mutex_.Lock();
-		tem_buffer_ = cur_buffer_; 
+		tem_buffer_ = cur_buffer_;
 		assert(cur_buffer_.use_count() == 2);
 		cur_buffer_.reset(new std::string());
 		cur_mutex_.Unlock();
@@ -112,8 +113,6 @@ namespace log
 		buffers_.push(tem_buffer);
 		cond_.Signal();
 		buffers_mutex_.Unlock();
-
-
 	}
 
 }

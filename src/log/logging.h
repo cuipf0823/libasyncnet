@@ -38,7 +38,9 @@ public:
 	Logging& operator=(const Logging& logger) = delete;
 
 	//异步模式
-	static void SetAsync(bool async);
+	static void SelectAsync();
+	static void SetAsyncInterval(uint32_t interval);
+	//通用
 	static void set_level(LogLevel level);
 	static LogLevel level();
 	static void AddSinks(DumpSinks::SinksPtr sink);
@@ -52,6 +54,8 @@ private:
 	static AppendCallBack append_cb_;
 	static FlushCallBack flush_cb_;
 	static AsyncLogPtr async_log_;
+	static uint32_t interval_;
+	static bool async_mode_;
 };
 
 class Logging::Impl
