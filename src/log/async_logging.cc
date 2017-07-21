@@ -100,9 +100,9 @@ namespace log
 	void AsyncLogging::Flush()
 	{
 		//无论cur_buffer_大小直接dump
-		BufferPtr tem_buffer_;
+		BufferPtr tem_buffer;
 		cur_mutex_.Lock();
-		tem_buffer_ = cur_buffer_;
+		tem_buffer = cur_buffer_;
 		assert(cur_buffer_.use_count() == 2);
 		cur_buffer_.reset(new std::string());
 		cur_mutex_.Unlock();

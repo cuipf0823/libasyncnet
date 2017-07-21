@@ -1,5 +1,6 @@
 #include "condition.h"
 #include <time.h>
+#include <errno.h>
 #include "mutex.h"
 
 namespace asyncnet
@@ -28,7 +29,7 @@ bool CondVar::WaitForSeconds(int seconds)
     // FIXME: use CLOCK_MONOTONIC or CLOCK_MONOTONIC_RAW to prevent time rewind.
     clock_gettime(CLOCK_REALTIME, &abstime);
     abstime.tv_sec += seconds;
-    return ETIMEDOUT == pthread_cond_timedwait(&pcond_, &mu_->mu_, &abstime);
+    return ETIMEDOUT == pthread_cond_timedwait(&cv_, &mu_->mu_, &abstime);
 }
 
 void CondVar::Signal()

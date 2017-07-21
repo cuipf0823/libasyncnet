@@ -83,6 +83,16 @@ namespace log
         interval_ = interval;
     }
 
+	void Logging::Append(const std::string& str)
+	{
+		DumpSinks::Append(str);
+	}
+
+	void Logging::Flush()
+	{
+		DumpSinks::Flush();
+	}
+
 	Logging::Impl::Impl(const char* file, int line, LogLevel level)
 		: file_(file),
 		line_(line),

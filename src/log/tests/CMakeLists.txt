@@ -10,4 +10,4 @@ add_definitions("-g -DDEBUG -Wall -MMD -funroll-loops -std=c++11")
 
 add_executable(log_test logging_test.cc)
 # message(${LOG_LIBRARY})
-target_link_libraries(log_test ${LOG_LIBRARY})
+target_link_libraries(log_test ${LOG_LIBRARY} pthread)

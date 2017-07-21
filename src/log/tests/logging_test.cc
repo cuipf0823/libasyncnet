@@ -1,6 +1,8 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <memory>
+#include <pthread.h>
+#include <assert.h>
 #include "logging.h"
 #include "sinks.h"
 
@@ -63,6 +65,41 @@ void LogTest(char* path)
 	asyncnet::log::Logging::RemoveSinks(sink);
 	LOG_ERROR << "Error log test abcdefghigklmnopqrst";
 	LOG_FATAL << "Fatal log test abcdefghigklmnopqrst";
+}
+
+void* ThreadFunc(void* arg)
+{
+	for (int idx = 0; idx < 100; ++idx)
+	{
+		LOG_DEBUG << "Test index: " << idx;
+		LOG_TRACE << "Trace test index " << idx + 100;
+		LOG_INFO << "Info test index " << idx + 1000;
+		LOG_NOTICE << "Notice test index " << idx + 10000;
+		LOG_WARN << "Warn test index " << idx + 100000;
+	}
+	LOG_ERROR << "Error log test abcdefghigklmnopqrst";
+	LOG_FATAL << "Fatal log test abcdefghigklmnopqrst";
+	return nullptr;
+}
+
+void AsyncLogTest(char* path)
+{
+	std::shared_ptr<asyncnet::log::FileSinks> sink = std::make_shared<asyncnet::log::FileSinks>(kLogPath, basename(path), kMaxSize);
+	std::shared_ptr<asyncnet::log::StdSinks> std_sink = std::make_shared<asyncnet::log::StdSinks>();
+	asyncnet::log::Logging::set_level(asyncnet::log::LogLevel::DEBUG);
+	asyncnet::log::Logging::AddSinks(sink);
+	asyncnet::log::Logging::AddSinks(std_sink);
+
+	//设置异步模式
+	asyncnet::log::Logging::SelectAsync();
+
+	//启动线程
+	pthread_t tid;
+	for (int idx = 0; idx < 5; ++idx)
+	{
+		int ret = pthread_create(&tid, nullptr, &ThreadFunc, nullptr);
+		assert(ret == 0);
+	}
 }
 
 
